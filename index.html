@@ -451,9 +451,15 @@
                 const dot = document.createElement('span');
                 dot.className = 'task-dot';
 
-                const text = document.createElement('span');
+                const isURL = URL.canParse(todo)
+                const text = document.createElement(isURL ? 'a' : 'span');
                 text.className = 'task-text';
                 text.textContent = todo;
+
+                if (isURL) {
+                    text.href = todo;
+                    text.target = "_blank";
+                }
 
                 const deleteButton = document.createElement('button');
                 deleteButton.className = 'delete-button';
