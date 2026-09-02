@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My ToDo</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --background: #f6f4fb;
+            --surface: #ffffff;
+            --surface-subtle: #f9f8fc;
+            --text: #252331;
+            --text-secondary: #777383;
+            --text-tertiary: #aaa6b4;
+            --border: #ebe8f1;
+            --primary: #7567e8;
+            --primary-light: #efedff;
+            --danger: #e56b87;
+            --shadow: 0 20px 60px rgba(57, 48, 91, 0.08);
+        }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 64px 20px;
+
+            color: var(--text);
+            background:
+                radial-gradient(circle at 15% 10%,
+                    rgba(236, 217, 255, 0.8),
+                    transparent 28%),
+                radial-gradient(circle at 90% 5%,
+                    rgba(210, 225, 255, 0.75),
+                    transparent 30%),
+                var(--background);
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Noto Sans JP",
+                "Hiragino Kaku Gothic ProN",
+                "Yu Gothic",
+                sans-serif;
+        }
+
+        .app {
+            width: 100%;
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+
+        .header {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 0 6px;
+        }
+
+        .eyebrow {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            margin: 0 0 9px;
+
+            color: var(--primary);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+        }
+
+        .eyebrow::before {
+            content: "";
+
+            width: 6px;
+            height: 6px;
+
+            border-radius: 50%;
+            background: var(--primary);
+        }
+
+        h1 {
+            margin: 0;
+
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1.2;
+            letter-spacing: -0.04em;
+        }
+
+        .counter {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 3px;
+        }
+
+        .counter-number {
+            color: var(--primary);
+            font-size: 28px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .counter-label {
+            color: var(--text-tertiary);
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+        }
+
+        /* Main card */
+
+        .card {
+            padding: 22px;
+
+            border: 1px solid rgba(255, 255, 255, 0.9);
+            border-radius: 26px;
+
+            background: rgba(255, 255, 255, 0.88);
+            box-shadow: var(--shadow);
+
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
+        /* Input */
+
+        .form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+        }
+
+        input {
+            width: 100%;
+            height: 52px;
+            padding: 0 17px;
+
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            outline: none;
+
+            color: var(--text);
+            background: var(--surface-subtle);
+
+            font: inherit;
+            font-size: 14px;
+
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+
+        input::placeholder {
+            color: var(--text-tertiary);
+        }
+
+        input:focus {
+            border-color: #c9c4ef;
+            background: var(--surface);
+        }
+
+        .add-button {
+            flex-shrink: 0;
+            width: 88px;
+            height: 52px;
+
+            border: 0;
+            border-radius: 15px;
+
+            color: #ffffff;
+            background: var(--primary);
+
+            cursor: pointer;
+
+            font: inherit;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .add-button:active {
+            opacity: 0.8;
+        }
+
+        /* List header */
+
+        .list-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin: 0 4px 10px;
+        }
+
+        .list-title {
+            color: var(--text-secondary);
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .list-hint {
+            color: var(--text-tertiary);
+            font-size: 11px;
+        }
+
+        /* Todo list */
+
+        ul {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            margin: 0;
+            padding: 0;
+
+            list-style: none;
+        }
+
+        li {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+
+            min-height: 58px;
+            padding: 10px 10px 10px 16px;
+
+            border: 1px solid var(--border);
+            border-radius: 16px;
+
+            background: var(--surface);
+        }
+
+        .task-dot {
+            flex-shrink: 0;
+
+            width: 9px;
+            height: 9px;
+
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 0 5px var(--primary-light);
+        }
+
+        .task-text {
+            min-width: 0;
+            flex: 1;
+
+            color: #373442;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+        }
+
+        .delete-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            flex-shrink: 0;
+
+            width: 34px;
+            height: 34px;
+
+            border: 0;
+            border-radius: 10px;
+
+            color: #aaa6b2;
+            background: transparent;
+
+            cursor: pointer;
+
+            font-size: 18px;
+            line-height: 1;
+        }
+
+        .delete-button:active {
+            color: var(--danger);
+            background: #fff1f4;
+        }
+
+        /* Empty state */
+
+        .empty {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            padding: 38px 20px 32px;
+
+            text-align: center;
+        }
+
+        .empty-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 58px;
+            height: 58px;
+            margin-bottom: 15px;
+
+            border-radius: 19px;
+
+            color: var(--primary);
+            background: var(--primary-light);
+
+            font-size: 25px;
+        }
+
+        .empty-title {
+            margin-bottom: 6px;
+
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .empty-description {
+            margin: 0;
+
+            color: var(--text-tertiary);
+            font-size: 12px;
+            line-height: 1.8;
+        }
+
+        /* Footer */
+
+        .footer {
+            margin-top: 17px;
+
+            color: #b2afba;
+
+            font-size: 9px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-align: center;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 36px 14px;
+            }
+
+            .header {
+                padding: 0 4px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 22px;
+            }
+
+            .form {
+                gap: 8px;
+            }
+
+            .add-button {
+                width: 76px;
+            }
+
+            .list-hint {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <main class="app">
+        <header class="header">
+            <div>
+                <p class="eyebrow">My Space</p>
+                <h1>やることリスト</h1>
+            </div>
+
+            <div class="counter">
+                <span class="counter-number" id="count">0</span>
+                <span class="counter-label">TASKS</span>
+            </div>
+        </header>
+
+        <section class="card">
+            <div class="form">
+                <div class="input-wrapper">
+                    <input type="text" id="input" placeholder="新しいタスクを入力..." autocomplete="off">
+                </div>
+
+                <button class="add-button" onclick="add()">
+                    ＋ 追加
+                </button>
+            </div>
+
+            <div class="list-header">
+                <span class="list-title">Your Tasks</span>
+                <span class="list-hint">小さな一歩から。</span>
+            </div>
+
+            <ul id="list"></ul>
+
+            <div class="empty" id="empty">
+                <div class="empty-icon">✦</div>
+
+                <div class="empty-title">
+                    まだタスクはありません
+                </div>
+
+                <p class="empty-description">
+                    今日やることをひとつ追加して、<br>
+                    ここから始めましょう。
+                </p>
+            </div>
+        </section>
+
+        <footer class="footer">
+            SAVED LOCALLY · YOUR DATA STAYS WITH YOU
+        </footer>
+    </main>
+
+    <script>
+        const input = document.getElementById('input');
+        const list = document.getElementById('list');
+        const count = document.getElementById('count');
+        const empty = document.getElementById('empty');
+
+        let todos = JSON.parse(localStorage.getItem('todos')) || [];
+
+        function render() {
+            list.innerHTML = '';
+
+            todos.forEach((todo, i) => {
+                const li = document.createElement('li');
+
+                const dot = document.createElement('span');
+                dot.className = 'task-dot';
+
+                const text = document.createElement('span');
+                text.className = 'task-text';
+                text.textContent = todo;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.className = 'delete-button';
+                deleteButton.textContent = '×';
+                deleteButton.setAttribute('aria-label', 'タスクを削除');
+                deleteButton.addEventListener('click', () => del(i));
+
+                li.appendChild(dot);
+                li.appendChild(text);
+                li.appendChild(deleteButton);
+
+                list.appendChild(li);
+            });
+
+            count.textContent = todos.length;
+            empty.style.display = todos.length === 0 ? 'flex' : 'none';
+
+            localStorage.setItem('todos', JSON.stringify(todos));
+        }
+
+        function add() {
+            const value = input.value.trim();
+
+            if (!value) {
+                input.focus();
+                return;
+            }
+
+            todos.push(value);
+            input.value = '';
+
+            render();
+            input.focus();
+        }
+
+        function del(i) {
+            todos.splice(i, 1);
+            render();
+        }
+
+        input.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                add();
+            }
+        });
+
+        render();
+    </script>
+</body>
+
+</html>
